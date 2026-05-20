@@ -1,11 +1,6 @@
-mod config;
-mod types;
-mod ingest;
-mod decision;
-mod execute;
-mod positions;
-
 use anyhow::Result;
+use hypercopy::{config, decision, execute, ingest, positions, types};
+use std::sync::Arc;
 use tracing_subscriber::EnvFilter;
 
 #[tokio::main]
@@ -16,11 +11,15 @@ async fn main() -> Result<()> {
         .init();
 
     let cfg = config::Config::load("config.toml")?;
-    tracing::info!(targets = cfg.targets.len(), "hypercopy starting");
+    tracing::info!(network = %cfg.hyperliquid.network, targets = cfg.targets.len(), "hypercopy starting");
 
-    let (tx, rx) = tokio::sync::mpsc::channel::<types::FillEvent>(1024);
+    // One-time meta load: coin -> asset index map.
+    let info = Arc::new(ingest::info::InfoClient::new(cfg.hyperliquid.api_url.clone()));
+    info.refresh_meta().await?;
+    tracing::info!("meta cache loaded");
 
-    // Spawn one WS subscriber per enabled target.
+    let (tx, mut rx) = tokio::sync::mpsc::channel::<types::FillEvent>(1024);
+
     for target in cfg.targets.iter().filter(|t| t.enabled) {
         let url = cfg.hyperliquid.ws_url.clone();
         let target = target.clone();
@@ -33,12 +32,10 @@ async fn main() -> Result<()> {
     }
     drop(tx);
 
-    // Main loop: consume fills, decide, execute.
     let engine = decision::Engine::new(cfg.clone());
-    let executor = execute::Executor::new(cfg.clone())?;
+    let executor = execute::Executor::new(cfg.clone(), info.clone())?;
     let mut positions = positions::Manager::new();
 
-    let mut rx = rx;
     while let Some(fill) = rx.recv().await {
         tracing::info!(?fill, "fill observed");
         match engine.decide(&fill, &positions) {

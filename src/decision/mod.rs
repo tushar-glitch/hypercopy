@@ -35,7 +35,6 @@ impl Engine {
             if let Some(open) = positions.find_open(&fill.target_address, &fill.coin) {
                 let intent = OrderIntent {
                     coin: fill.coin.clone(),
-                    asset_index: 0, // TODO: resolve via InfoClient::meta() cache
                     side: invert(open.side),
                     px: fill.px, // IOC near observed px; executor may re-quote off mid
                     sz: open.sz,
@@ -63,7 +62,6 @@ impl Engine {
 
         Action::Mirror(OrderIntent {
             coin: fill.coin.clone(),
-            asset_index: 0, // TODO: resolve via meta
             side: fill.side,
             px: fill.px,
             sz,

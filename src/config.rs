@@ -13,8 +13,13 @@ pub struct Config {
 
 #[derive(Debug, Clone, Deserialize)]
 pub struct Hyperliquid {
+    pub network: String, // "testnet" | "mainnet"
     pub api_url: String,
     pub ws_url: String,
+}
+
+impl Hyperliquid {
+    pub fn is_mainnet(&self) -> bool { self.network == "mainnet" }
 }
 
 #[derive(Debug, Clone, Deserialize)]

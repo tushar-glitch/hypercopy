@@ -24,10 +24,10 @@ pub struct FillEvent {
 }
 
 /// Mirror order we want to submit on our own account.
+/// Asset index is resolved by the executor at submit time via the meta cache.
 #[derive(Debug, Clone)]
 pub struct OrderIntent {
     pub coin: String,
-    pub asset_index: u32,
     pub side: Side,
     pub px: f64,
     pub sz: f64,

@@ -1,8 +1,10 @@
 # Hyperliquid copy-bot config. Copy to config.toml and fill in.
 
 [hyperliquid]
-api_url = "https://api.hyperliquid.xyz"
-ws_url  = "wss://api.hyperliquid.xyz/ws"
+# network = "testnet" | "mainnet" — controls EIP-712 source byte ("b" vs "a")
+network = "testnet"
+api_url  = "https://api.hyperliquid-testnet.xyz"
+ws_url   = "wss://api.hyperliquid-testnet.xyz/ws"
 
 [wallet]
 # Address of the AGENT wallet (approved via approveAgent from your main wallet).

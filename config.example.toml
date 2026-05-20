@@ -1,0 +1,38 @@
+# Hyperliquid copy-bot config. Copy to config.toml and fill in.
+
+[hyperliquid]
+api_url = "https://api.hyperliquid.xyz"
+ws_url  = "wss://api.hyperliquid.xyz/ws"
+
+[wallet]
+# Address of the AGENT wallet (approved via approveAgent from your main wallet).
+# The private key lives in .env as HYPERCOPY_AGENT_KEY — never commit it.
+agent_address = "0x0000000000000000000000000000000000000000"
+
+# Your main wallet address (where the funds live, what HL sees as the trader).
+main_address = "0x0000000000000000000000000000000000000000"
+
+[risk]
+# Hard caps. The decision engine refuses to size beyond these.
+max_concurrent_positions = 3
+max_leverage              = 5.0
+max_notional_usd          = 500.0
+daily_drawdown_stop_pct   = 10.0
+
+[sizing]
+# Mirror strategy: fixed_pct (of your equity) or proportional (to target's equity).
+mode             = "fixed_pct"
+fixed_pct        = 2.0   # 2% of equity per mirrored entry
+
+# Watchlist. Add wallets you've vetted from hyperdash.info / hypurrscan.io.
+[[targets]]
+address = "0x0000000000000000000000000000000000000001"
+label   = "example-whale-1"
+weight  = 1.0
+enabled = true
+
+[[targets]]
+address = "0x0000000000000000000000000000000000000002"
+label   = "example-whale-2"
+weight  = 0.5
+enabled = false
